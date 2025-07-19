@@ -15,7 +15,7 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto/create-user.dto';
 import { CreateMentorDto } from './dto/create-mentor.dto/create-mento.dto';
 import { CreateAsisant } from './dto/create-asisant.dto/create-asissant.dto';
-import { UpdateMentorDto } from '../mentors/dto/update-mentor.dto/update-mentor.dto';
+import { UpdateMentorDto } from './mentors/dto/update-mentor.dto/update-mentor.dto';
 import { UserRole } from '@prisma/client';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth/jwt-auth.guard';
 import { RolesGuard } from 'src/common/guards/roles/roles.guard';

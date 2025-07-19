@@ -5,7 +5,7 @@ import { RegisterAuthDto } from './dto/register-auth.dto/register-auth.dto';
 import { compare, hash } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { LoginAuthDto } from './dto/login-auth.dto/login-auth.dto';
-import { VerificationService } from 'src/modules/verification/verification.service';
+import { VerificationService } from 'src/modules/auth/verification/verification.service';
 import { EVeriification } from 'src/common/utils/helper/helper';
 
 @Injectable()

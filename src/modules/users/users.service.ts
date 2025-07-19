@@ -4,7 +4,7 @@ import { CreateUserDto } from './dto/create-user.dto/create-user.dto';
 import { UserRole } from '@prisma/client';
 import { CreateMentorDto } from './dto/create-mentor.dto/create-mento.dto';
 import { CreateAsisant } from './dto/create-asisant.dto/create-asissant.dto';
-import { UpdateMentorDto } from '../mentors/dto/update-mentor.dto/update-mentor.dto';
+import { UpdateMentorDto } from './mentors/dto/update-mentor.dto/update-mentor.dto';
 import * as bcrypt from 'bcrypt';
 
 
@@ -173,16 +173,16 @@ export class UsersService {
         });
         const createProfile = await this.prisma.mentorProfile.create({
             data: {
-            about: payload.about,
-            experience: payload.experience,
-            facebook: payload.facebook ? `https://facebook.com/${payload.facebook}` : null,
-            github: payload.github ? `https://github.com/${payload.github}` : null,
-            instagram: payload.instagram ? `https://instagram.com/${payload.instagram}` : null,
-            job: payload.job,
-            linkedin: payload.linkedin ? `https://linkedin.com/in/${payload.linkedin}` : null,
-            telegram: payload.telegram ? `https://t.me/${payload.telegram}` : null,
-            userId: adminCreate.id,
-            website: payload.website,
+                about: payload.about,
+                experience: payload.experience,
+                facebook: payload.facebook ? `https://facebook.com/${payload.facebook}` : null,
+                github: payload.github ? `https://github.com/${payload.github}` : null,
+                instagram: payload.instagram ? `https://instagram.com/${payload.instagram}` : null,
+                job: payload.job,
+                linkedin: payload.linkedin ? `https://linkedin.com/in/${payload.linkedin}` : null,
+                telegram: payload.telegram ? `https://t.me/${payload.telegram}` : null,
+                userId: adminCreate.id,
+                website: payload.website,
             },
         });
 
@@ -239,16 +239,28 @@ export class UsersService {
 
     }
     async deleteUserById(id: number) {
-        const existsUser = await this.prisma.user.findUnique({ where: { id } })
-        if (!existsUser) throw new NotFoundException('user not found')
+        const existsUser = await this.prisma.user.findUnique({ where: { id } });
+        if (!existsUser) throw new NotFoundException('User not found');
 
-        await this.prisma.mentorProfile.delete({ where: { userId: id } })
-        await this.prisma.user.delete({ where: { id } })
+        await this.prisma.$transaction(async (tx) => {
+            if (existsUser.role === UserRole.MENTOR) {
+                const mentorProfile = await tx.mentorProfile.findUnique({ where: { userId: id } });
+                if (mentorProfile) {
+                    await tx.mentorProfile.delete({ where: { userId: id } });
+                }
+            }
+
+            await tx.lessonView.deleteMany({ where: { userId: id } });
+
+            await tx.user.delete({ where: { id } });
+        });
+
         return {
             success: true,
-            message: "successfully deleted!"
-        }
+            message: 'Successfully deleted!',
+        };
     }
+
 
 
 }

@@ -253,7 +253,6 @@ model Exam {
   variantC      String
   variantD      String
   answer        ExamAnswer
-  lessonBolimId Int
   lessonGroupId Int
 
   group LessonGroup @relation(fields: [lessonGroupId], references: [id], onDelete: Cascade)

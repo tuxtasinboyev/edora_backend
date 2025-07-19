@@ -17,9 +17,9 @@ export const multerStorage = (folder: string) =>
 export const multerStorages = () =>
     diskStorage({
         destination: (req, file, cb) => {
-            let folder = 'uploads/others';
-            if (file.fieldname === 'banner') folder = 'uploads/banner';
-            if (file.fieldname === 'introVideo') folder = 'uploads/introVideo';
+            let folder = '../uploads/others';
+            if (file.fieldname === 'banner') folder = '../uploads/banner';
+            if (file.fieldname === 'introVideo') folder = '../uploads/introVideo';
 
             if (!fs.existsSync(folder)) {
                 fs.mkdirSync(folder, { recursive: true });
@@ -33,6 +33,31 @@ export const multerStorages = () =>
             cb(null, filename);
         },
     });
+export const videoStorage = {
+    storage: diskStorage({
+        destination: '../uploads/videos',
+        filename: (req, file, cb) => {
+            cb(null, `${uuidv4()}${extname(file.originalname)}`);
+        },
+    }),
+    fileFilter: (req, file, cb) => {
+        const allowedTypes = ['video/mp4', 'video/mkv', 'video/avi'];
+        if (allowedTypes.includes(file.mimetype)) {
+            cb(null, true);
+        } else {
+            cb(new Error('Only video files are allowed!'), false);
+        }
+    },
+};
+export const fileStorage = {
+    storage: diskStorage({
+        destination: '../uploads/files',
+        filename: (req, file, cb) => {
+            cb(null, `${uuidv4()}${extname(file.originalname)}`);
+        },
+    })
+};
+
 export enum EVeriification {
     REGISTER = 'register',
     RESET_PASSWORD = 'reset_password',
