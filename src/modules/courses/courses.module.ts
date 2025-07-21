@@ -9,6 +9,6 @@ import { RatingModule } from './rating/rating.module';
 @Module({
   controllers: [CoursesController],
   providers: [CoursesService],
-  imports: [CourseCategoryModule, PrismaModule, JwtModule, RatingModule]
+  imports: [CourseCategoryModule, PrismaModule, JwtModule, RatingModule],
 })
-export class CoursesModule { }
+export class CoursesModule {}

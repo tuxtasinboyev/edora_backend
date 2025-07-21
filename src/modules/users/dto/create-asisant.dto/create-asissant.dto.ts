@@ -1,18 +1,25 @@
-import { UserRole } from "@prisma/client"
-import { IsEnum, IsNotEmpty, IsNumber, IsString } from "class-validator"
+import { UserRole } from '@prisma/client';
+import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+
 export class CreateAsisant {
-    @IsNotEmpty()
-    @IsString()
-    phone: string
+  @ApiProperty({ example: '+998901234567', description: 'Assistant phone number' })
+  @IsNotEmpty()
+  @IsString()
+  phone: string;
 
-    @IsNotEmpty()
-    @IsString()
-    password: string
+  @ApiProperty({ example: 'strongPassword123', description: 'Assistant password' })
+  @IsNotEmpty()
+  @IsString()
+  password: string;
 
-    @IsNotEmpty()
-    @IsString()
-    fullName: string
-    @IsNotEmpty()
-    @IsString()
-    courseId:string
+  @ApiProperty({ example: 'John Doe', description: 'Assistant full name' })
+  @IsNotEmpty()
+  @IsString()
+  fullName: string;
+
+  @ApiProperty({ example: 'courseId123', description: 'ID of the course' })
+  @IsNotEmpty()
+  @IsString()
+  courseId: string;
 }

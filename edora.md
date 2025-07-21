@@ -3,6 +3,7 @@
 ## Ma'lumotlar bazasi strukturasi
 
 ### types
+
 ```
 UserRole = ADMIN | MENTOR | ASSISTANT | STUDENT
 
@@ -17,6 +18,7 @@ ExamAnswer = variantA | variantB | variantC | variantD
 ```
 
 ### Users jadval
+
 ```
     id SERIAL NOT NULL,
     phone TEXT NOT NULL,
@@ -26,7 +28,9 @@ ExamAnswer = variantA | variantB | variantC | variantD
     image TEXT,
     createdAt TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 ```
+
 ### MentorProfile
+
 ```
     "id" SERIAL NOT NULL,
     "about" TEXT,
@@ -40,13 +44,17 @@ ExamAnswer = variantA | variantB | variantC | variantD
     "website" TEXT,
      user_id: serial FOREIGN KEY REFERENCES users(id)
 ```
-### CourseCategory 
+
+### CourseCategory
+
 ```
     id SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ```
+
 ### Course
+
 ```
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name TEXT NOT NULL,
@@ -64,7 +72,9 @@ ExamAnswer = variantA | variantB | variantC | variantD
     FOREIGN KEY ("categoryId") REFERENCES "CourseCategory"("id") ON DELETE CASCADE,
     FOREIGN KEY ("mentorId") REFERENCES "User"("id") ON DELETE CASCADE
 ```
+
 ### AssignedCourse
+
 ```
     userId INTEGER NOT NULL,
     courseId UUID NOT NULL,
@@ -73,7 +83,9 @@ ExamAnswer = variantA | variantB | variantC | variantD
     FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE,
     FOREIGN KEY ("courseId") REFERENCES "Course"("id") ON DELETE CASCADE
 ```
+
 ### PurchasedCourse
+
 ```
     courseId UUID NOT NULL,
     userId INTEGER NOT NULL,
@@ -84,7 +96,9 @@ ExamAnswer = variantA | variantB | variantC | variantD
     FOREIGN KEY ("courseId") REFERENCES "Course"("id") ON DELETE CASCADE,
     FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE
 ```
+
 ### Rating
+
 ```
     id SERIAL PRIMARY KEY,
     rate INTEGER NOT NULL,
@@ -96,14 +110,16 @@ ExamAnswer = variantA | variantB | variantC | variantD
     FOREIGN KEY ("courseId") REFERENCES "Course"("id") ON DELETE CASCADE,
     FOREIGN KEY ("userId") REFERENCES "User"("id")
 ```
+
 ### LastActivity
+
 ```
     id SERIAL PRIMARY KEY,
     userId INTEGER UNIQUE NOT NULL,
     courseId UUID,
     groupId INTEGER,
     lessonId UUID,
-    url TEXT, 
+    url TEXT,
     updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE,
@@ -111,7 +127,9 @@ ExamAnswer = variantA | variantB | variantC | variantD
     FOREIGN KEY ("groupId") REFERENCES "LessonGroup"("id"),
     FOREIGN KEY ("lessonId") REFERENCES "Lesson"("id")
 ```
+
 ### LessonBo'lim
+
 ```
     id SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
@@ -120,7 +138,9 @@ ExamAnswer = variantA | variantB | variantC | variantD
 
     FOREIGN KEY ("courseId") REFERENCES "Course"("id")
 ```
+
 ### Lesson
+
 ```
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name TEXT NOT NULL,
@@ -132,7 +152,9 @@ ExamAnswer = variantA | variantB | variantC | variantD
 
     FOREIGN KEY ("groupId") REFERENCES "LessonGroup"("id")
 ```
+
 ### LessonView
+
 ```
     lessonId UUID NOT NULL,
     userId INTEGER NOT NULL,
@@ -141,7 +163,9 @@ ExamAnswer = variantA | variantB | variantC | variantD
     FOREIGN KEY ("lessonId") REFERENCES "Lesson"("id") ON DELETE CASCADE,
     FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE
 ```
+
 ### LessonFile
+
 ```
     id SERIAL PRIMARY KEY,
     file TEXT NOT NULL,
@@ -151,7 +175,9 @@ ExamAnswer = variantA | variantB | variantC | variantD
 
     FOREIGN KEY ("lessonId") REFERENCES "Lesson"("id") ON DELETE CASCADE ON UPDATE CASCADE
 ```
+
 ### Homework
+
 ```
     id SERIAL PRIMARY KEY,
     task TEXT NOT NULL,
@@ -162,7 +188,9 @@ ExamAnswer = variantA | variantB | variantC | variantD
 
     FOREIGN KEY ("lessonId") REFERENCES "Lesson"("id") ON DELETE CASCADE    ON UPDATE CASCADE
 ```
+
 ### HomeworkSubmission
+
 ```
     id SERIAL PRIMARY KEY,
     text TEXT,
@@ -177,7 +205,9 @@ ExamAnswer = variantA | variantB | variantC | variantD
     FOREIGN KEY ("homeworkId") REFERENCES "Homework"("id") ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE
 ```
+
 ### Exam
+
 ```
     id SERIAL PRIMARY KEY,
     question TEXT NOT NULL,
@@ -191,7 +221,9 @@ ExamAnswer = variantA | variantB | variantC | variantD
 
     FOREIGN KEY ("lessonGroupId") REFERENCES "LessonGroup"("id") ON DELETE CASCADE ON UPDATE CASCADE
 ```
+
 ### ExamResult
+
 ```
     id SERIAL PRIMARY KEY,
     lessonGroupId INTEGER NOT NULL,
@@ -204,7 +236,9 @@ ExamAnswer = variantA | variantB | variantC | variantD
     FOREIGN KEY ("lessonGroupId") REFERENCES "LessonGroup"("id") ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE
 ```
+
 ### Question
+
 ```
     id SERIAL PRIMARY KEY,
     userId INTEGER NOT NULL,
@@ -219,7 +253,9 @@ ExamAnswer = variantA | variantB | variantC | variantD
     CONSTRAINT "Question_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE,
     CONSTRAINT "Question_courseId_fkey" FOREIGN KEY ("courseId") REFERENCES "Course" ("id") ON DELETE CASCADE
 ```
+
 ### QuestionAnswer
+
 ```
     id SERIAL PRIMARY KEY,
     questionId INTEGER UNIQUE NOT NULL,
@@ -234,6 +270,3 @@ ExamAnswer = variantA | variantB | variantC | variantD
 ```
 
 ## Endpointlar
-
-
-

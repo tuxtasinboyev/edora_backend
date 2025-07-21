@@ -1,26 +1,43 @@
-import { CourseLevel } from "@prisma/client";
-import { IsBoolean, IsDecimal, IsEnum, IsNumber, IsString } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
+import {
+  IsString,
+  IsEnum,
+  IsDecimal,
+  IsNumber,
+  IsBoolean,
+} from 'class-validator';
+import { Type } from 'class-transformer';
+import { CourseLevel } from '@prisma/client';
 
 export class CreateCourseDto {
-    @IsString()
-    name: string
+  @ApiProperty({ example: 'JavaScript for Beginners' })
+  @IsString()
+  name: string;
 
-    @IsString()
-    about: string
+  @ApiProperty({ example: 'Learn the basics of JavaScript programming' })
+  @IsString()
+  about: string;
 
-    @IsDecimal()
-    price: string
+  @ApiProperty({ example: '49.99' })
+  @IsDecimal()
+  price: string;
 
-    @IsString()
-    @IsEnum(CourseLevel)
-    level: CourseLevel
+  @ApiProperty({ enum: CourseLevel, example: CourseLevel.BEGINNER })
+  @IsEnum(CourseLevel)
+  level: CourseLevel;
 
-    @IsNumber()
-    categoryId: number
+  @ApiProperty({ example: 1 })
+  @Type(() => Number)
+  @IsNumber()
+  categoryId: number;
 
-    @IsBoolean()
-    published: boolean
+  @ApiProperty({ example: true })
+  @Type(() => Boolean)
+  @IsBoolean()
+  published: boolean;
 
-    @IsNumber()
-    mentorId: number
+  @ApiProperty({ example: 5 })
+  @Type(() => Number)
+  @IsNumber()
+  mentorId: number;
 }

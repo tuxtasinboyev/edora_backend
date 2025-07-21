@@ -1,20 +1,26 @@
-import { IsDateString, IsNotEmpty, IsNumber, IsString } from "class-validator"
+import { IsDateString, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateLessonDto {
-    @IsNotEmpty()
-    @IsString()
-    name: string
+  @ApiProperty({ example: 'Introduction to TypeScript' })
+  @IsNotEmpty()
+  @IsString()
+  name: string;
 
-    @IsNotEmpty()
-    @IsString()
-    about: string
+  @ApiProperty({ example: 'This lesson covers the basics of TypeScript.' })
+  @IsNotEmpty()
+  @IsString()
+  about: string;
 
-    @IsNumber()
-    groupId?: number
+  @ApiPropertyOptional({ example: 3 })
+  @IsNumber()
+  groupId?: number;
 
-    @IsDateString()
-    updatedAt?: Date
+  @ApiPropertyOptional({ example: '2025-07-20T12:00:00Z' })
+  @IsDateString()
+  updatedAt?: Date;
 
-    @IsString()
-    courseId?: string
+  @ApiPropertyOptional({ example: 'clx1l4kf40001s01ozk3m9i6d' })
+  @IsString()
+  courseId?: string;
 }

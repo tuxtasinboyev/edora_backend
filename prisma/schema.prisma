@@ -302,7 +302,7 @@ model QuestionAnswer {
 
 model Permission {
   id         Int      @id @default(autoincrement())
-  name       String   @unique
+  name       String   
   userId     Int      @unique
   can_read   Boolean  @default(false)
   can_write  Boolean  @default(false)

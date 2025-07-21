@@ -9,4 +9,4 @@ import { JwtModule } from '@nestjs/jwt';
   controllers: [LessonsGroupController],
   providers: [LessonsGroupService],
 })
-export class LessonsGroupModule { }
+export class LessonsGroupModule {}

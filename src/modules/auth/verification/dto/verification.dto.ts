@@ -1,13 +1,18 @@
-import { IsEnum, IsString } from "class-validator";
-import { EVeriification } from "src/common/utils/helper/helper";
+import { IsEnum, IsString } from 'class-validator';
+import { EVeriification } from 'src/common/utils/helper/helper';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class SendOtpDto {
-    @IsEnum(EVeriification)
-    type: EVeriification
+  @ApiProperty({ enum: EVeriification })
+  @IsEnum(EVeriification)
+  type: EVeriification;
 
-    @IsString()
-    phone: string
+  @ApiProperty({ example: '+998901234567' })
+  @IsString()
+  phone: string;
 }
+
 export class VerifyOtpDto extends SendOtpDto {
-    otp: string
+  @ApiProperty({ example: '1234' })
+  otp: string;
 }

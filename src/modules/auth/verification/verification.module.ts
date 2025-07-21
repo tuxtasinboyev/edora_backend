@@ -9,6 +9,6 @@ import { PrismaModule } from 'src/prisma/prisma.module';
   imports: [RedisModule, PrismaModule],
   providers: [VerificationService, SmsService],
   controllers: [VerificationController],
-  exports:[VerificationService]
+  exports: [VerificationService],
 })
-export class VerificationModule { }
+export class VerificationModule {}

@@ -8,4 +8,4 @@ import { PrismaModule } from 'src/prisma/prisma.module';
   controllers: [CourseCategoryController],
   providers: [CourseCategoryService],
 })
-export class CourseCategoryModule { }
+export class CourseCategoryModule {}

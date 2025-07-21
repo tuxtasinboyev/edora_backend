@@ -1,12 +1,16 @@
-import { IsNumber, IsString } from "class-validator";
+import { IsNumber, IsString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateRatingDto {
-    @IsNumber()
-    rating: number
+  @ApiProperty({ example: 5 })
+  @IsNumber()
+  rating: number;
 
-    @IsString()
-    comment:string
+  @ApiProperty({ example: 'Ajoyib kurs, hammasi tushunarli!' })
+  @IsString()
+  comment: string;
 
-    @IsString()
-    courseId:string
+  @ApiProperty({ example: 'clx1l4kf40001s01ozk3m9i6d' })
+  @IsString()
+  courseId: string;
 }

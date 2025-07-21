@@ -1,6 +1,8 @@
-import { IsString } from "class-validator";
+import { IsString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateCourseCategoryDto {
-    @IsString()
-    name: string
+  @ApiProperty({ example: 'Frontend Development' })
+  @IsString()
+  name: string;
 }
