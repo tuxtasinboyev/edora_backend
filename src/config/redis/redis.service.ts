@@ -7,18 +7,26 @@ export class RedisService implements OnModuleInit {
   private logs = new Logger(RedisService.name);
 
   constructor() {
-    this.redis_client = new Redis(); 
+    const host = process.env.REDIS_HOST || 'localhost';
+    const port = Number(process.env.REDIS_PORT) || 6379;
+
+    this.redis_client = new Redis({
+      host,
+      port,
+    });
+
     this.redis_client.on('connect', () => {
-      this.logs.log('✅ Redis connected');
+      this.logs.log('✅ Redis ulandi');
     });
 
     this.redis_client.on('error', (err) => {
-      this.logs.error('❌ Redis connection error:', err.message);
+      this.logs.error('❌ Redisda xatolik:', err);
     });
   }
 
+
   onModuleInit() {
-   
+
   }
 
   async set(key: string, code: string, ttlSeconds: number) {

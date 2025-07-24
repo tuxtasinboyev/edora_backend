@@ -1,0 +1,36 @@
+name: 🚀 Auto Deploy to Ubuntu via SSH
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: 🔧 Deploy edora_backend to Server
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🚀 Deploy using SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            # 1. Loyihani clone yoki pull qilish
+            cd /home/${{ secrets.SERVER_USER }}
+
+            if [ -d "edora_backend" ]; then
+              cd edora_backend
+              git reset --hard
+              git pull origin main
+            else
+              git clone https://github.com/tuxtasinboyev/edora_backend.git
+              cd edora_backend
+            fi
+
+            # 2. Docker Compose bajarish
+            docker compose down || true
+            docker compose pull || true
+            docker compose up -d --build

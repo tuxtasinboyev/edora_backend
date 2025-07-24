@@ -263,7 +263,6 @@ export class CoursesController {
 @Get('my-courses/:userId')
 @ApiOperation({ summary: 'Get courses created by logged-in mentor' })
 
-// Swagger uchun optional query parametrlari
 @ApiQuery({ name: 'offset', required: false, type: Number })
 @ApiQuery({ name: 'limit', required: false, type: Number })
 @ApiQuery({ name: 'search', required: false, type: String })
