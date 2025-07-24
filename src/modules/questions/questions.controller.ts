@@ -35,7 +35,7 @@ import {
   ApiBody,
 } from '@nestjs/swagger';
 
-@ApiTags('Questions')
+@ApiTags('Questions & Answers')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('questions')

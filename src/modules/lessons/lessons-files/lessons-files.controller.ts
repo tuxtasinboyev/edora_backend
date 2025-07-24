@@ -31,7 +31,7 @@ import {
 @ApiBearerAuth()
 @Controller('lessons-files')
 export class LessonsFilesController {
-  constructor(private readonly lessonsFilesService: LessonsFilesService) {}
+  constructor(private readonly lessonsFilesService: LessonsFilesService) { }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN', 'MENTOR')
@@ -44,6 +44,7 @@ export class LessonsFilesController {
       type: 'object',
       properties: {
         lessonId: { type: 'string', example: 'lesson123' },
+        note: { type: 'string', example: 'This file contains lecture notes for Lesson 1' },
         file: {
           type: 'string',
           format: 'binary',

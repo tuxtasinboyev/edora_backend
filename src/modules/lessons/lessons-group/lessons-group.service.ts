@@ -1,12 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateLessonsGroupDto } from './dto/create-lessons-group.dto';
 import { UpdateLessonsGroupDto } from './dto/update-lessons-group.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class LessonsGroupService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
   async create(createLessonsGroupDto: CreateLessonsGroupDto) {
+    const existsNAME = await this.prisma.lessonGroup.findFirst({ where: { name: createLessonsGroupDto.name } })
+    if (existsNAME) throw new NotFoundException('this name already exists')
     const { name, courseId } = createLessonsGroupDto;
     const existsCourse = await this.prisma.course.findUnique({
       where: { id: courseId },
@@ -126,11 +128,16 @@ export class LessonsGroupService {
   }
 
   async update(id: number, updateLessonsGroupDto: UpdateLessonsGroupDto) {
+
     const existsCourse = await this.prisma.course.findUnique({
       where: { id: updateLessonsGroupDto.courseId },
     });
     if (!existsCourse) throw new NotFoundException('course not found!');
 
+    const existsName = await this.prisma.lessonGroup.findFirst({
+      where: { name: updateLessonsGroupDto.name },
+    });
+    if (existsCourse) throw new ConflictException('this name already exist!')
     const existsGroup = await this.prisma.lessonGroup.findUnique({
       where: { id },
     });

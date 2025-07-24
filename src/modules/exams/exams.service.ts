@@ -14,7 +14,7 @@ import { UpdateExamDto } from './dto/update-exam.dto/update-exam.dto';
 
 @Injectable()
 export class ExamsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
   async getExamLessonGroupByLessonGroupId(
     lessonGroupId: number,
     userId: number,
@@ -312,56 +312,55 @@ export class ExamsService {
       success: true,
       message: 'successfully deleted!',
     };
+  }async getResults(
+  user_id: number,
+  offset: number = 0,
+  limit: number = 8,
+  lesson_group_id?: number,
+  passed?: boolean
+) {
+  const where: any = {
+    userId: user_id,
+  };
+
+  if (typeof lesson_group_id === 'number' && !isNaN(lesson_group_id)) {
+    where.lessonGroupId = lesson_group_id;
   }
-  async getResults(query: any) {
-    const { offset, limit, lesson_group_id, user_id, passed } = query;
 
-    const where: any = {};
+  if (typeof passed === 'boolean') {
+    where.passed = passed;
+  }
 
-    if (lesson_group_id && !isNaN(+lesson_group_id)) {
-      where.lessonGroupId = +lesson_group_id;
-    }
-
-    if (user_id && !isNaN(+user_id)) {
-      where.userId = +user_id;
-    }
-
-    if (passed !== undefined) {
-      if (passed === 'true') where.passed = true;
-      else if (passed === 'false') where.passed = false;
-    }
-
-    const take = limit && !isNaN(+limit) ? +limit : 10;
-    const skip = offset && !isNaN(+offset) ? +offset : 0;
-
-    const results = await this.prisma.examResult.findMany({
-      where,
-      take,
-      skip,
-      orderBy: { createdAt: 'desc' },
-      include: {
-        user: {
-          select: {
-            id: true,
-            fullName: true,
-            image: true,
-          },
-        },
-        group: {
-          select: {
-            id: true,
-            name: true,
-          },
+  const results = await this.prisma.examResult.findMany({
+    where,
+    skip: !isNaN(offset) ? offset : 0,
+    take: !isNaN(limit) ? limit : 8,
+    orderBy: { createdAt: 'desc' },
+    include: {
+      user: {
+        select: {
+          id: true,
+          fullName: true,
+          image: true,
         },
       },
-    });
+      group: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  });
 
-    return {
-      success: true,
-      count: results.length,
-      data: results,
-    };
-  }
+  return {
+    success: true,
+    count: results.length,
+    data: results,
+  };
+}
+
+
   async getResultsByLessonGroup(lessonGroupId: number, query: any) {
     const { offset, limit, user_id, passed } = query;
 

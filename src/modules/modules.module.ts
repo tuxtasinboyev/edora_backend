@@ -19,6 +19,8 @@ import { QuestionsModule } from './questions/questions.module';
 
 import { PaymentsModule } from './payments/payments.module';
 import { HomeworkModule } from './homework/homework.module';
+import { PurchasedModule } from './purchased/purchased.module';
+import { FilesModule } from './files/files.module';
 
 @Module({
   imports: [
@@ -36,6 +38,8 @@ import { HomeworkModule } from './homework/homework.module';
     QuestionsModule,
     PaymentsModule,
     HomeworkModule,
+    PurchasedModule,
+    FilesModule,
   ],
   controllers: [],
   providers: [],

@@ -1,26 +1,33 @@
-import { Injectable } from '@nestjs/common';
-import { CreatePaymentDto } from './dto/create-payment.dto';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { CheckoutDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class PaymentsService {
-  create(createPaymentDto: CreatePaymentDto) {
-    return 'This action adds a new payment';
-  }
+  constructor(private readonly prisma: PrismaService) { }
 
-  findAll() {
-    return `This action returns all payments`;
-  }
+  async createCheckout(userId: number, dto: CheckoutDto) {
+    const course = await this.prisma.course.findUnique({
+      where: { id: dto.courseId },
+    });
+    if (!course) throw new NotFoundException('Course not found');
 
-  findOne(id: number) {
-    return `This action returns a #${id} payment`;
-  }
+    const existingPurchase = await this.prisma.purchasedCourse.findFirst({
+      where: { userId, courseId: dto.courseId },
+    });
+    if (existingPurchase) {
+      throw new ConflictException('You have already purchased this course');
+    }
 
-  update(id: number, updatePaymentDto: UpdatePaymentDto) {
-    return `This action updates a #${id} payment`;
-  }
+    const fakeCheckoutUrl = `https://fakepay.com/checkout?course=${dto.courseId}&user=${userId}`;
 
-  remove(id: number) {
-    return `This action removes a #${id} payment`;
+    return {
+      success: true,
+      message: 'Checkout link created',
+      data: {
+        checkoutUrl: fakeCheckoutUrl,
+      },
+    };
   }
 }

@@ -21,7 +21,7 @@ export class VerificationService {
     private redisService: RedisService,
     private prisma: PrismaService,
     private smsService: SmsService,
-  ) {}
+  ) { }
   public getKey(type: EVeriification, phone: string, confirmatioin?: boolean) {
     const storeKeys: Record<EVeriification, string> = {
       [EVeriification.REGISTER]: 'reg_',
@@ -49,68 +49,87 @@ export class VerificationService {
   private getMessage(type: EVeriification, otp: string) {
     switch (type) {
       case EVeriification.REGISTER:
-        return `san kimligini tasdiqlash uchun:${otp}=>code`;
+        return `Fixoo platformasida telefoningizni o'zgartirish uchun tasdiqlash kodi: ${otp}. Kodni hech kimga bermang!`;
       case EVeriification.RESET_PASSWORD:
-        return `sani paswordingni almashtishi uchun:${otp}=>code`;
+        return `Fixoo platformasida parolingizni tiklash uchun tasdiqlash kodi: ${otp}. Kodni hech kimga bermang!`;
       case EVeriification.EDIT_PHONE:
-        return `phone edit qilish uchun:${otp}=>code`;
-
-      default:
-        break;
+        return `Fixoo platformasida telefoningizni o'zgartirish uchun tasdiqlash kodi: ${otp}. Kodni hech kimga bermang!`;
     }
+
   }
   async verifyOtp(payload: VerifyOtpDto) {
     const { type, phone, otp } = payload;
+
     const session = await this.redisService.get(this.getKey(type, phone));
-    if (!session) throw new BadRequestException('otp expired');
-    if (otp !== JSON.parse(session))
-      throw new BadRequestException('invalid otp');
+    if (!session) throw new BadRequestException('OTP expired');
+
+    console.log('body OTP:', otp, typeof otp);
+    console.log('Redis session:', session, typeof session);
+
+    if (String(otp) !== String(session)) {
+      throw new BadRequestException('Invalid OTP');
+    }
+
     await this.redisService.delete(this.getKey(type, phone));
+
     await this.redisService.set(
       this.getKey(type, phone, true),
-      JSON.stringify(otp),
+      otp,
       60 * 60,
     );
+
     return {
       success: true,
       message: 'Verified',
     };
   }
+
+
   public async checkConfirim(payload: ICheckOtp) {
     const { type, phone, otp } = payload;
-    const session = await this.redisService.get(this.getKey(type, phone, true));
+
+    const key = this.getKey(type, phone, true);
+    console.log(key, "checkConfirm key");
+
+    const session = await this.redisService.get(key);
+    console.log(session, "session from redis");
+
     if (!session) throw new BadRequestException('Session expired');
-    if (otp !== JSON.parse(session)) {
-      throw new BadRequestException('invalid otp');
+
+    if (otp !== session) {
+      throw new BadRequestException('Invalid OTP');
     }
-    await this.redisService.delete(this.getKey(type, phone, true));
+
+    await this.redisService.delete(key);
     return true;
   }
+
   async sendOtp(payload: SendOtpDto) {
     const { type, phone } = payload;
     const key = this.getKey(type, phone);
-    const sesion = await this.redisService.get(key);
+    console.log(key, 'sendOtp key');
 
-    if (sesion) {
-      throw new HttpException('Code already send to user', 400);
-    }
+    const session = await this.redisService.get(key);
+    // if (session) {
+    //   throw new BadRequestException('Code already sent to user');
+    // }
+
     switch (type) {
       case EVeriification.REGISTER:
         await this.throwIfUserExists(phone);
         break;
       case EVeriification.EDIT_PHONE:
-        await this.throwIfUserNotExists(phone);
-        break;
       case EVeriification.RESET_PASSWORD:
         await this.throwIfUserNotExists(phone);
         break;
-
-      default:
-        break;
     }
+
     const otp = generateOtp();
-    await this.redisService.set(key, JSON.stringify(otp), 60 * 60);
+    await this.redisService.set(key, otp, 60 * 60);
+
     await this.smsService.sendSMS(this.getMessage(type, otp)!, phone);
-    return { message: 'Confirm send code to user' };
+
+    return { message: 'Confirm code sent to user' };
   }
+
 }

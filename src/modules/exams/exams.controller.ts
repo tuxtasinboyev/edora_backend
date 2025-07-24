@@ -9,6 +9,7 @@ import {
   Query,
   ParseIntPipe,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { ExamsService } from './exams.service';
 import {
@@ -30,61 +31,51 @@ import {
 } from '@nestjs/swagger';
 
 @ApiTags('Exams')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('exams')
 export class ExamsController {
   constructor(private examService: ExamsService) { }
 
-  @ApiBearerAuth()
   @Get('lesson-group/:lessonGroupId')
-  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('STUDENT')
   @ApiOperation({ summary: 'Get exam by lesson group ID' })
   @ApiParam({ name: 'lessonGroupId', type: Number })
-  @ApiQuery({ name: 'user_id', type: String })
   async getByLessonGroup(
     @Param('lessonGroupId', ParseIntPipe) lessonGroupId: number,
-    @Query('user_id') userId: string,
+    @Req() req,
   ) {
     return this.examService.getExamLessonGroupByLessonGroupId(
       lessonGroupId,
-      +userId,
+      req.user.id,
     );
   }
 
-  @ApiBearerAuth()
   @Post('pass')
-  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('STUDENT')
   @ApiOperation({ summary: 'Submit answers and pass exam' })
-  @ApiQuery({ name: 'user_id', type: String })
   async passExam(
     @Body() payload: PassExamDto,
-    @Query('user_id') userId: string,
+    @Req() req,
   ) {
-    return this.examService.pass(payload, +userId);
+    return this.examService.pass(payload, req.user.id);
   }
 
-  @ApiBearerAuth()
   @Post()
-  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN', 'MENTOR')
   @ApiOperation({ summary: 'Create one exam' })
   async createExam(@Body() payload: CreateExamDto) {
     return this.examService.createExam(payload);
   }
 
-  @ApiBearerAuth()
   @Post('createManyExam')
-  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN', 'MENTOR')
   @ApiOperation({ summary: 'Create many exams at once' })
   async createManyExam(@Body() payload: CreateManyExamDto) {
     return this.examService.createManyExam(payload);
   }
 
-  @ApiBearerAuth()
   @Get('details/:lessonGroupId')
-  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN', 'MENTOR')
   @ApiOperation({ summary: 'Get all exam details by lesson group ID' })
   @ApiParam({ name: 'lessonGroupId', type: Number })
@@ -94,9 +85,7 @@ export class ExamsController {
     return this.examService.getAllExamDetails(lessonGroupId);
   }
 
-  @ApiBearerAuth()
   @Get(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN', 'MENTOR')
   @ApiOperation({ summary: 'Get exam by ID' })
   @ApiParam({ name: 'id', type: Number })
@@ -104,9 +93,7 @@ export class ExamsController {
     return this.examService.getdetailById(id);
   }
 
-  @ApiBearerAuth()
   @Put(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN', 'MENTOR')
   @ApiOperation({ summary: 'Update exam by ID' })
   @ApiParam({ name: 'id', type: Number })
@@ -117,28 +104,44 @@ export class ExamsController {
     return this.examService.updateExam(id, payload);
   }
 
-  @ApiBearerAuth()
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN', 'MENTOR')
   @ApiOperation({ summary: 'Delete exam by ID' })
   @ApiParam({ name: 'id', type: Number })
   async deleteExam(@Param('id', ParseIntPipe) id: number) {
     return this.examService.deleteExamById(id);
   }
+@Get('results')
+@Roles('ADMIN')
+@ApiOperation({ summary: 'Get all exam results (admin only)' })
+@ApiQuery({ name: 'offset', required: false, type: String })
+@ApiQuery({ name: 'limit', required: false, type: String })
+@ApiQuery({ name: 'lesson_group_id', required: false, type: String })
+@ApiQuery({ name: 'passed', required: false, type: String })
+async getResults(
+  @Req() req,
+  @Query('offset') offset?: string,
+  @Query('limit') limit?: string,
+  @Query('lesson_group_id') lessonGroupId?: string,
+  @Query('passed') passed?: string,
+) {
+  return this.examService.getResults(
+    req.user.id,
+    offset && !isNaN(+offset) ? +offset : 0,
+    limit && !isNaN(+limit) ? +limit : 8,
+    lessonGroupId && !isNaN(+lessonGroupId) ? +lessonGroupId : undefined,
+    passed === 'true' ? true : passed === 'false' ? false : undefined,
+  );
+}
 
-  @ApiBearerAuth()
-  @Get('results')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
-  @ApiOperation({ summary: 'Get all exam results (admin only)' })
-  async getResults(@Query() query: any) {
-    return this.examService.getResults(query);
-  }
 
-  @ApiBearerAuth()
+
+
+
+
+
+
   @Get('results/lesson-group/:id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('MENTOR')
   @ApiOperation({ summary: 'Get exam results for a lesson group (mentor only)' })
   @ApiParam({ name: 'id', type: Number })

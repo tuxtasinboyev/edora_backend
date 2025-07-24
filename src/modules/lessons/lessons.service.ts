@@ -7,7 +7,7 @@ import * as path from 'path';
 
 @Injectable()
 export class LessonsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
   async getOneById(id: string, userId: number) {
     const existsLesson = await this.prisma.lesson.findUnique({
       where: { id, lessonViews: { some: { userId: userId } } },
@@ -154,6 +154,13 @@ export class LessonsService {
       success: true,
       data: result,
     };
+  }
+  async getAllLesson(userId: number) {
+    const result = await this.prisma.lesson.findMany({ where: { homework: { submissions: { some: { userId: userId } } } } })
+    return {
+      success: true,
+      data: result
+    }
   }
   async delteLesson(id: string) {
     const existsLessonView = await this.prisma.lesson.findUnique({

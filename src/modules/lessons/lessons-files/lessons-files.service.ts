@@ -9,7 +9,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class LessonsFilesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
   async createLessonFile(payload: CreateLessonsFileDto, file: string) {
     if (!file) {
       throw new BadRequestException('File is required!');

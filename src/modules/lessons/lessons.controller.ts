@@ -11,6 +11,7 @@ import {
   UploadedFile,
   Patch,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { LessonsService } from './lessons.service';
 import { CreateLessonDto } from './dto/create-lesson.dto/create-lesson.dto';
@@ -27,6 +28,7 @@ import {
   ApiParam,
   ApiQuery,
   ApiBody,
+  ApiResponse,
 } from '@nestjs/swagger';
 
 @ApiTags('Lessons')
@@ -40,25 +42,27 @@ export class LessonsController {
   @Get(':id')
   @ApiOperation({ summary: 'Get lesson by ID for student with view count' })
   @ApiParam({ name: 'id', type: String })
-  @ApiQuery({ name: 'userId', type: Number })
   async getOneById(
     @Param('id') id: string,
-    @Query('userId', ParseIntPipe) userId: number,
+    @Req() req,
   ) {
+    const userId = req.user.id;
     return this.lessonsService.getOneById(id, userId);
   }
+
 
   @Roles('STUDENT')
   @Get(':id/views')
   @ApiOperation({ summary: 'Get lesson views for student' })
   @ApiParam({ name: 'id', type: String })
-  @ApiQuery({ name: 'userId', type: Number })
   async getOneLessonViews(
     @Param('id') id: string,
-    @Query('userId', ParseIntPipe) userId: number,
+    @Req() req,
   ) {
+    const userId = req.user.id;
     return this.lessonsService.getOneLessonViews(id, userId);
   }
+
 
   @Roles('ADMIN', 'MENTOR')
   @Get(':id/details')
@@ -99,4 +103,15 @@ export class LessonsController {
   ) {
     return this.lessonsService.updateLessons(payload, video.filename, id);
   }
+  @Roles('STUDENT')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Get('student/homework-lessons')
+  @ApiOperation({ summary: 'Get all lessons with submitted homework by the student' })
+  @ApiResponse({ status: 200, description: 'List of lessons with student submissions' })
+  async getAllHomeworkLessons(@Req() req) {
+    const userId = req.user.id;
+    return this.lessonsService.getAllLesson(userId);
+  }
+
 }

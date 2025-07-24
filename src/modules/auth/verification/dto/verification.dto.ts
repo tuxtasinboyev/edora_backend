@@ -14,5 +14,6 @@ export class SendOtpDto {
 
 export class VerifyOtpDto extends SendOtpDto {
   @ApiProperty({ example: '1234' })
+  @IsString()
   otp: string;
 }

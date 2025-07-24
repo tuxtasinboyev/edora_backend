@@ -16,7 +16,7 @@ import { RolesGuard } from 'src/common/guards/roles/roles.guard';
 import { Roles } from 'src/common/decorators/roles/roles.decorator';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery, ApiParam } from '@nestjs/swagger';
 
-@ApiTags('Rating')
+@ApiTags('Course-Rating')
 @Controller('rating')
 export class RatingController {
   constructor(private readonly ratingService: RatingService) { }
@@ -45,16 +45,15 @@ export class RatingController {
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiResponse({ status: 200, description: 'List of ratings for the course' })
   getRatingListBy(
-    @Param('courseId') courseId: string,
-    @Query('offset') offset?: number,
-    @Query('limit') limit?: number,
-  ) {
-    return this.ratingService.getRatingListBy(
-      courseId,
-      Number(offset),
-      Number(limit),
-    );
-  }
+  @Param('courseId') courseId: string,
+  @Query('offset') offset?: string,
+  @Query('limit') limit?: string,
+) {
+  const skip = isNaN(Number(offset)) ? 0 : Number(offset);
+  const take = isNaN(Number(limit)) ? 8 : Number(limit);
+  return this.ratingService.getRatingListBy(courseId, skip, take);
+}
+
 
   @Get('course/:id')
   @ApiOperation({ summary: 'Get course details by ID' })

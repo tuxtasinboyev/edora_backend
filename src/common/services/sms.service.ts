@@ -7,7 +7,7 @@ export class SmsService {
   private readonly TOKEN = process.env.SMS_TOKEN;
   private readonly FROM = process.env.SMS_FROM;
   private readonly URL = process.env.SMS_URL;
-  private readonly USERNAME = process.env.SMS_LOGIN;
+  private readonly USERNAME = process.env.SMS_USERNAME;
   private readonly CALLBACK_URL = process.env.SMS_CALLBACK_URL;
 
   private axiosInstance = axios.create({
@@ -38,6 +38,8 @@ export class SmsService {
         },
       );
     } catch (error: any) {
+      console.log(error);
+
       throw new HttpException(
         'SMS Service: ' + (error?.response?.statusText || error.message),
         400,

@@ -11,6 +11,7 @@ import {
   UseGuards,
   UseInterceptors,
   Request,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { HomeworkService } from './homework.service';
 import {
@@ -42,8 +43,6 @@ import {
 export class HomeworkController {
   constructor(private readonly homeworkService: HomeworkService) {}
 
-  // ... other methods unchanged ...
-
   @Post('create')
   @Roles('MENTOR', 'ADMIN')
   @UseInterceptors(FileInterceptor('file', homeworkFile))
@@ -53,17 +52,13 @@ export class HomeworkController {
     schema: {
       type: 'object',
       properties: {
-        file: {
-          type: 'string',
-          format: 'binary',
-          description: 'Homework file',
-        },
-        // Include other CreateHomeworkDto properties here if needed
-        lessonId: { type: 'string', example: 'lesson123' }, // example, adjust as needed
-        title: { type: 'string', example: 'Homework Title' },
-        description: { type: 'string', example: 'Homework description' },
+        file: { type: 'string', format: 'binary' },
+        lessonId: { type: 'string' },
+        title: { type: 'string' },
+        task: { type: 'string' },
+        description: { type: 'string' },
       },
-      required: ['file', 'lessonId', 'title'], // required fields from CreateHomeworkDto
+      required: ['file', 'lessonId', 'title'],
     },
   })
   createHomework(
@@ -83,14 +78,9 @@ export class HomeworkController {
     schema: {
       type: 'object',
       properties: {
-        file: {
-          type: 'string',
-          format: 'binary',
-          description: 'Homework file',
-        },
-        // Include other UpdateHomeworkDto properties here if needed
-        title: { type: 'string', example: 'Updated Homework Title' },
-        description: { type: 'string', example: 'Updated description' },
+        file: { type: 'string', format: 'binary' },
+        title: { type: 'string' },
+        description: { type: 'string' },
       },
     },
   })
@@ -112,13 +102,9 @@ export class HomeworkController {
     schema: {
       type: 'object',
       properties: {
-        file: {
-          type: 'string',
-          format: 'binary',
-          description: 'Submitted homework file',
-        },
-        // Include other CreateHomeworkSubmissionDto properties here if needed
-        comments: { type: 'string', example: 'My submission comments' },
+        file: { type: 'string', format: 'binary' },
+        text: { type: 'string' },
+        reason: { type: 'string' },
       },
       required: ['file'],
     },
@@ -137,4 +123,85 @@ export class HomeworkController {
     );
   }
 
+  @Get('course/:courseId')
+  @Roles('STUDENT')
+  @ApiOperation({ summary: 'Get all homework by courseId' })
+  @ApiParam({ name: 'courseId', type: String })
+  @ApiQuery({ name: 'offset', required: false, type: String })
+  @ApiQuery({ name: 'limit', required: false, type: String })
+  getHomeworkByCourseId(
+    @Param('courseId') courseId: string,
+    @Query('offset') offset?: string,
+    @Query('limit') limit?: string,
+  ) {
+    return this.homeworkService.getHomeworkByCourseId(
+      courseId,
+      +offset! || 0,
+      +limit! || 10,
+    );
+  }
+
+  @Get('lesson/:lessonId/details')
+  @Roles('STUDENT', 'MENTOR', 'ADMIN')
+  @ApiOperation({ summary: 'Get full homework details by lessonId' })
+  @ApiParam({ name: 'lessonId', type: String })
+  getHomeworkDetails(@Param('lessonId') lessonId: string) {
+    return this.homeworkService.getHommeworkAllDetails(lessonId);
+  }
+
+  @Get('mine-submissions/:lessonId')
+  @Roles('STUDENT')
+  @ApiOperation({ summary: 'Get my homework submissions for a lesson' })
+  @ApiParam({ name: 'lessonId', type: String })
+  @ApiQuery({ name: 'offset', required: false, type: String })
+  @ApiQuery({ name: 'limit', required: false, type: String })
+  getMineSubmission(
+    @Param('lessonId') lessonId: string,
+    @Request() req,
+    @Query('offset') offset?: string,
+    @Query('limit') limit?: string,
+  ) {
+    return this.homeworkService.getMineSubmission(
+      lessonId,
+      req.user.id,
+      +offset! || 0,
+      +limit! || 8,
+    );
+  }
+
+  @Get('submission')
+  @Roles('MENTOR', 'ADMIN')
+  @ApiOperation({ summary: 'Get all homework submissions (filterable)' })
+  @ApiQuery({ name: 'offset', required: false, type: String })
+  @ApiQuery({ name: 'limit', required: false, type: String })
+  @ApiQuery({ name: 'status', required: false, type: String })
+  @ApiQuery({ name: 'course_id', required: false, type: String })
+  @ApiQuery({ name: 'homework_id', required: false, type: String })
+  @ApiQuery({ name: 'user_id', required: false, type: String })
+  getAllSubmissions(@Query() query: any) {
+    return this.homeworkService.getAllSubmissions(query);
+  }
+
+  @Get('submission/:id')
+  @Roles('MENTOR', 'ADMIN')
+  @ApiOperation({ summary: 'Get one homework submission by ID' })
+  @ApiParam({ name: 'id', type: Number })
+  getSubmissionOne(@Param('id', ParseIntPipe) id: number) {
+    return this.homeworkService.getSubmissionsOneById(id);
+  }
+
+  @Patch('submission/check')
+  @Roles('MENTOR', 'ADMIN')
+  @ApiOperation({ summary: 'Approve/Reject homework submission' })
+  checkSubmission(@Body() dto: CheckAproved) {
+    return this.homeworkService.checkSubmisionHommework(dto);
+  }
+
+  @Delete(':id')
+  @Roles('MENTOR', 'ADMIN')
+  @ApiOperation({ summary: 'Delete a homework by ID' })
+  @ApiParam({ name: 'id', type: Number })
+  deleteHomework(@Param('id', ParseIntPipe) id: number) {
+    return this.homeworkService.remove(id);
+  }
 }
