@@ -37,3 +37,4 @@ async function bootstrap() {
   console.log('🚀 Server ishladi: http://localhost:1709/api/edura');
 }
 bootstrap();
+//salom
