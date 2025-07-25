@@ -1,5 +1,5 @@
-name: 🚀 Auto Deploy to Ubuntu via SSH
-
+name: Deploy to Server
+description: Deploy the application to the server using SSH and Docker Compose
 on:
   push:
     branches:
@@ -7,30 +7,37 @@ on:
 
 jobs:
   deploy:
-    name: 🔧 Deploy edora_backend to Server
     runs-on: ubuntu-latest
 
     steps:
-      - name: 🚀 Deploy using SSH
-        uses: appleboy/ssh-action@v1.0.0
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy over SSH and run Docker Compose
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            # 1. Loyihani clone yoki pull qilish
-            cd /home/${{ secrets.SERVER_USER }}
+            echo "Creating project folder if it doesn't exist!"
+            mkdir -p /home/ubuntu/fixoo
+            cd /home/ubuntu/fixoo
 
-            if [ -d "edora_backend" ]; then
-              cd edora_backend
-              git reset --hard
-              git pull origin main
+            if [ ! -d "fixoo-backend/.git" ]; then
+              echo "Cloning repository!" 
+              git clone https://github.com/Sultonkulov99/fixoo-backend
             else
-              git clone https://${{ secrets.GH_TOKEN }}@github.com/tuxtasinboyev/edora_backend.git
-              cd edora_backend
+              echo "Pulling latest changes!"
+              cd fixoo-backend    
+              git pull origin main  
             fi
+  
+            echo "Stopping containers"
+            docker compose down
 
-            # 2. Docker Compose bajarish
-            docker compose down || true
-            docker compose pull || true
-            docker compose up -d --build
+            echo "Building containers"
+            docker compose build 
+
+            echo "Running containers"
+            docker compose up -d
