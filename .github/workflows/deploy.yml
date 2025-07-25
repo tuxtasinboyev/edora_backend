@@ -7,38 +7,34 @@ on:
 
 jobs:
   deploy:
+    name: 🔧 Deploy edora_backend to Server
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Deploy over SSH and run Docker Compose
-        uses: appleboy/ssh-action@v1.0.3
+      - name: 🚀 Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            echo "Creating project folder if it doesn't exist!"
-            mkdir -p /home/ubuntu/fixoo
-            cd /home/ubuntu/fixoo
+            echo "👉 Loyihani yuklab olish yoki yangilash..."
+            cd /home/${{ secrets.SERVER_USER }}
 
             if [ -d "edora_backend" ]; then
-              echo "Cloning repository!" 
-                 git clone https://${{ secrets.GH_TOKEN }}@github.com/tuxtasinboyev/edora_backend.git
               cd edora_backend
-            else
-              echo "Pulling latest changes!"
-              cd edora_backend
+              git reset --hard
+              git clean -fd
               git pull origin main
+            else
+              git clone https://${{ secrets.GH_TOKEN }}@github.com/tuxtasinboyev/edora_backend.git
+              cd edora_backend
             fi
-  
-            echo "Stopping containers"
-            docker compose down
 
-            echo "Building containers"
-            docker compose build 
+            echo "🧼 Eski containerlarni to‘xtatish..."
+            docker compose down || true
 
-            echo "Running containers"
-            docker compose up -d
+            echo "📦 Docker build va up..."
+            docker compose up -d --build
+
+            echo "✅ Deploy yakunlandi!"

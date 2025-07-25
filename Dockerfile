@@ -4,15 +4,15 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm install
+RUN npm install --production
 
 COPY prisma ./prisma
+RUN npx prisma generate
 
 COPY . .
 
 RUN npm run build
-RUN npx prisma generate
 
 EXPOSE 1709
 
-CMD ["npm","run","start:dev"]
+CMD ["npm", "run", "start:prod"]
