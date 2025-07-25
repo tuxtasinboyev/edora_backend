@@ -27,7 +27,7 @@ services:
     env_file:
       - .env
     ports:
-      - "1709:1709" # 👈 tashqi 1709 → ichki 1709
+      - "1709:1709" 
     restart: always
     command: npm run start:prod
 
