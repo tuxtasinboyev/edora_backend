@@ -63,6 +63,7 @@ model User {
   ExamResult       ExamResult[]
   Permissions      Permission[]
   permissionId     Int?
+  Transaction      Transaction[]
 }
 
 model MentorProfile {
@@ -112,6 +113,7 @@ model Course {
   lessons      Lesson[]
   lessonGroups LessonGroup[]
   LastActivity LastActivity[]
+  Transaction  Transaction[]
 }
 
 model AssignedCourse {
@@ -302,7 +304,7 @@ model QuestionAnswer {
 
 model Permission {
   id         Int      @id @default(autoincrement())
-  name       String   
+  name       String
   userId     Int      @unique
   can_read   Boolean  @default(false)
   can_write  Boolean  @default(false)
@@ -310,4 +312,19 @@ model Permission {
   can_update Boolean  @default(false)
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt  DateTime @default(now())
+}
+
+model Transaction {
+  id           String    @id @default(uuid())
+  pid          String    @unique
+  amount       Decimal
+  perform_time DateTime?
+  create_time  DateTime?
+  cancel_time  DateTime?
+  state        Int
+  reason       Int?
+  userId       Int?
+  user         User?     @relation(references: [id], fields: [userId], onDelete: SetNull)
+  courseId     String?
+  course       Course?   @relation(references: [id], fields: [courseId], onDelete: SetNull)
 }
