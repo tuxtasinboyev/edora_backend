@@ -26,7 +26,7 @@ jobs:
               git reset --hard
               git pull origin main
             else
-              git clone https://github.com/tuxtasinboyev/edora_backend.git
+              git clone https://${{ secrets.GH_TOKEN }}@github.com/tuxtasinboyev/edora_backend.git
               cd edora_backend
             fi
 
