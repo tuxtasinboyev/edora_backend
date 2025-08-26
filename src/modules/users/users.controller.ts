@@ -8,6 +8,8 @@ import {
   Delete,
   Put,
   UseGuards,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto/create-user.dto';
@@ -18,6 +20,7 @@ import { JwtAuthGuard } from 'src/common/guards/jwt-auth/jwt-auth.guard';
 import { RolesGuard } from 'src/common/guards/roles/roles.guard';
 import { Roles } from 'src/common/decorators/roles/roles.decorator';
 import { UpdateMentorDto } from './dto/create-mentor.dto/update-mentor.dto';
+import { v4 as uuidv4 } from 'uuid';
 
 import {
   ApiTags,
@@ -27,7 +30,11 @@ import {
   ApiQuery,
   ApiParam,
   ApiBody,
+  ApiConsumes,
 } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 
 @ApiTags('Users')
 @ApiBearerAuth()
@@ -58,12 +65,47 @@ export class UsersController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
   @Post('mentor')
-  @ApiOperation({ summary: 'Create a new mentor' })
+  @ApiOperation({ summary: 'Create a new mentor and upload an image' })
   @ApiResponse({ status: 201, description: 'Mentor created successfully' })
-  @ApiBody({ type: CreateMentorDto })
-  createMentor(@Body() dto: CreateMentorDto) {
-    return this.userService.createMentor(dto);
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Create a new mentor and upload an image',
+    schema: {
+      type: 'object',
+      properties: {
+        phone: { type: 'string', example: '+998901234567', description: 'Telefon raqam (UZ)' },
+        fullName: { type: 'string', example: 'Ali Valiyev', description: 'To‘liq ism' },
+        password: { type: 'string', example: 'securePassword123', description: 'Parol' },
+        experience: { type: 'number', example: 5, description: 'Ish tajribasi (yillar)' },
+        job: { type: 'string', example: 'Frontend Developer', description: 'Kasbi' },
+        telegram: { type: 'string', example: 'https://t.me/username', description: 'Telegram URL' },
+        facebook: { type: 'string', example: 'https://facebook.com/username', description: 'Facebook URL' },
+        instagram: { type: 'string', example: 'https://instagram.com/username', description: 'Instagram URL' },
+        linkedin: { type: 'string', example: 'https://linkedin.com/in/username', description: 'LinkedIn URL' },
+        github: { type: 'string', example: 'https://github.com/username', description: 'GitHub URL' },
+        website: { type: 'string', example: 'https://mywebsite.com', description: 'Shaxsiy sayt URL' },
+        file: { type: 'string', format: 'binary', description: 'Profile image (optional)' },
+      },
+    },
+  })
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads/mentors',
+        filename: (req, file, cb) => {
+          const ext = extname(file.originalname);
+          cb(null, `${uuidv4()}${ext}`);
+        },
+      }),
+    }),
+  )
+  async createMentor(
+    @Body() dto: CreateMentorDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.userService.createMentor(dto, file?.filename);
   }
+
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN', 'MENTOR')
