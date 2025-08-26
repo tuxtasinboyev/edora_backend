@@ -455,11 +455,9 @@ export class CoursesService {
     });
     if (!existsCategory) throw new NotFoundException('category not found!');
 
-    const BASE_URL = 'http://localhost:1709/uploads/banner/';
-    const BASE_URLs = 'http://localhost:1709/uploads/introVideo/';
 
-    const bannerUrl = banner ? `${BASE_URL}${banner}` : null;
-    const introVideoUrl = introVideo ? `${BASE_URLs}${introVideo}` : null;
+    const bannerUrl = banner ? `${banner}` : null;
+    const introVideoUrl = introVideo ? `${introVideo}` : null;
 
     const existsName = await this.prisma.course.findFirst({ where: { name: payload.name } })
     if (existsName) throw new ConflictException('this course already exists')
