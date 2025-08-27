@@ -163,7 +163,7 @@ export class UsersService {
     };
   }
 
-  async createMentor(payload: CreateMentorDto) {
+  async createMentor(payload: CreateMentorDto, file: string) {
     const existMentor = await this.prisma.user.findUnique({
       where: { phone: payload.phone },
     });
@@ -179,6 +179,7 @@ export class UsersService {
         password: hashedPassword,
         phone: payload.phone,
         role: UserRole.MENTOR,
+        image: file
       },
     });
     const createProfile = await this.prisma.mentorProfile.create({
