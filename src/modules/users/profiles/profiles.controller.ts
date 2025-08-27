@@ -8,6 +8,7 @@ import {
   UploadedFile,
   UseInterceptors,
   Post,
+  BadRequestException,
 } from '@nestjs/common';
 import { ProfilesService } from './profiles.service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
@@ -53,11 +54,11 @@ export class ProfilesController {
       fileFilter(req, file, callback) {
         const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
         if (!allowedTypes.includes(file.mimetype)) {
-          return callback(new Error('Invalid file type'), false);
+          return callback(new BadRequestException('Invalid file type'), false);
         }
 
         if (!file.mimetype.startsWith('image/')) {
-          return callback(new Error('Only image files are allowed'), false);
+          return callback(new BadRequestException('Only image files are allowed'), false);
         }
         callback(null, true);
       },

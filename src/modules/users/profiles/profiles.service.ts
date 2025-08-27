@@ -105,7 +105,7 @@ export class ProfilesService {
     }
     let imageUrl: string | undefined = existsUser.image || undefined;
     if (filename) {
-      imageUrl = `${'http://localhost:1709'}/uploads/image/${filename}`;
+      imageUrl = `${'https://edora-backend.onrender.com'}/uploads/image/${filename}`;
     }
 
     const updateMyProfile = await this.prisma.user.update({
