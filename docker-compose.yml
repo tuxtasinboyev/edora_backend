@@ -1,16 +1,11 @@
 version: '3.9'
 
 services:
- 
-
   app:
     build: .
     env_file:
       - .env
     ports:
-      - "1709:1709" 
+      - "1709:1709"
     restart: always
     command: sh -c "npm run start:prod"
-
-volumes:
-  pgdata:

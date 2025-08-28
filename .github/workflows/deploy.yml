@@ -27,6 +27,7 @@ jobs:
               git clean -fd
               git pull origin main
             else
+              git clone https://github.com/tuxtasinboyev/edora_backend.git
               cd edora_backend
             fi
 
