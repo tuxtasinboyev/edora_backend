@@ -40,7 +40,7 @@ import {
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('questions')
 export class QuestionsController {
-  constructor(private readonly questionsService: QuestionsService) {}
+  constructor(private readonly questionsService: QuestionsService) { }
 
   @Get('mine')
   @Roles('STUDENT')
@@ -84,12 +84,26 @@ export class QuestionsController {
     @Query('read', ParseBoolPipe) read?: boolean,
     @Query('answered', ParseBoolPipe) answered?: boolean,
   ) {
-    return this.questionsService.getQuestiosByCourseId(
+    return this.questionsService.getQuestionsByCourseId(
       courseId,
       Number(offset) || 0,
       Number(limit) || 8,
       read,
       answered,
+    );
+  }
+  @Get('AllQuestions')
+  @Roles('MENTOR', 'ADMIN')
+  @ApiOperation({ summary: 'Get all questions MENTOR, ADMIN' })
+  getQuestionsAll() {
+    return this.questionsService.getQuestionsByAll(
+    );
+  }
+  @Get('AllAnswers')
+  @Roles('MENTOR', 'ADMIN')
+  @ApiOperation({ summary: 'Get all answers MENTOR, ADMIN' })
+  getAnswerAll() {
+    return this.questionsService.getAnswerAll(
     );
   }
 

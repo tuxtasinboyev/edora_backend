@@ -48,7 +48,26 @@ export class QuestionsService {
         }
 
     }
-    async getQuestiosByCourseId(
+    async getQuestionsByAll() {
+        return this.prisma.question.findMany({
+            include: {
+                user: { select: { id: true, fullName: true, image: true } },
+                course: { select: { id: true, name: true } },
+                answer: {
+                    select: {
+                        id: true,
+                        text: true,
+                        file: true,
+                        user: { select: { id: true, fullName: true, image: true } }
+                    }
+                }
+            }
+        });
+    }
+    async getAnswerAll() {
+        return this.prisma.questionAnswer.findMany({ include: { user: { select: { id: true, fullName: true, image: true } }, question: { select: { id: true, text: true, file: true } } } })
+    }
+    async getQuestionsByCourseId(
         courseId: string,
         offset: number = 0,
         limit: number = 8,
@@ -150,7 +169,7 @@ export class QuestionsService {
         }
 
         if (existsQuestion.file) {
-             const oldPath = join(process.cwd(), 'uploads', 'questionFile', existsQuestion.file.split('/').pop()!)
+            const oldPath = join(process.cwd(), 'uploads', 'questionFile', existsQuestion.file.split('/').pop()!)
             if (existsSync(oldPath)) {
                 unlinkSync(oldPath)
             }
