@@ -67,6 +67,48 @@ export class QuestionsService {
     async getAnswerAll() {
         return this.prisma.questionAnswer.findMany({ include: { user: { select: { id: true, fullName: true, image: true } }, question: { select: { id: true, text: true, file: true } } } })
     }
+
+    async getQuestionsByMentorId(
+        mentorId: number,
+        offset: number = 0,
+        limit: number = 8,
+        read?: boolean,
+        answered?: boolean,
+    ) {
+        const existMentorId = await this.prisma.user.findUnique({ where: { id: mentorId } })
+        if (!existMentorId) throw new NotFoundException('mentor not found!')
+
+        const where: any = {
+            mentorId: mentorId
+        }
+        if (read !== undefined) {
+            where.read = read === true
+        }
+        if (answered !== undefined) {
+            const isAnswered = answered === true
+            where.AND = [...(where.AND || []), isAnswered ? { answer: { not: null } } : { answer: null }]
+        }
+
+        const question = await this.prisma.question.findMany({
+            where,
+            skip: offset,
+            take: limit,
+            orderBy: { createdAt: "desc" },
+            include: {
+                answer: true, course: { select: { id: true, name: true } }, user: {
+                    select: {
+                        id: true, fullName: true, image: true
+
+                    }
+                }
+            }
+        })
+        return {
+            success: true,
+            data: question
+        }
+    }
+
     async getQuestionsByCourseId(
         courseId: string,
         offset: number = 0,
@@ -78,7 +120,7 @@ export class QuestionsService {
         if (!existCourseId) throw new NotFoundException('course not found!')
 
         const where: any = {
-            courseId
+            courseId: courseId
         }
         if (read !== undefined) {
             where.read = read === true

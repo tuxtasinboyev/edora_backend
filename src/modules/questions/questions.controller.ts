@@ -92,6 +92,31 @@ export class QuestionsController {
       answered,
     );
   }
+
+  @Get('by-course/:mentorId')
+  @Roles('MENTOR', 'ADMIN',)
+  @ApiOperation({ summary: 'Get all questions by mentorId' })
+  @ApiParam({ name: 'mentorId', type: String })
+  @ApiQuery({ name: 'offset', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiQuery({ name: 'read', required: false, type: Boolean })
+  @ApiQuery({ name: 'answered', required: false, type: Boolean })
+  getQuestionsByMentor(
+    @Param('mentorId') mentorId: number,
+    @Query('offset') offset?: number,
+    @Query('limit') limit?: number,
+    @Query('read', ParseBoolPipe) read?: boolean,
+    @Query('answered', ParseBoolPipe) answered?: boolean,
+  ) {
+    return this.questionsService.getQuestionsByMentorId(
+      mentorId,
+      Number(offset) || 0,
+      Number(limit) || 8,
+      read,
+      answered,
+    );
+  }
+
   @Get('AllQuestions')
   @Roles('MENTOR', 'ADMIN')
   @ApiOperation({ summary: 'Get all questions MENTOR, ADMIN' })
