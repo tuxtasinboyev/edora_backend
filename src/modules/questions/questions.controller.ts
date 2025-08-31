@@ -93,7 +93,7 @@ export class QuestionsController {
     );
   }
 
-  @Get('by-course/:mentorId')
+  @Get('by-course-mentorId/:mentorId')
   @Roles('MENTOR', 'ADMIN',)
   @ApiOperation({ summary: 'Get all questions by mentorId' })
   @ApiParam({ name: 'mentorId', type: String })
