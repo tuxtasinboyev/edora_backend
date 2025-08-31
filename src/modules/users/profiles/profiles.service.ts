@@ -68,24 +68,30 @@ export class ProfilesService {
     if (existsUser.role === UserRole.MENTOR) {
       const mentorProfile = await this.prisma.mentorProfile.findUnique({
         where: { userId: existsUser.id },
+        include: { user: true },
       });
 
       if (!mentorProfile) {
         throw new NotFoundException('Mentor profile not found');
       }
+      const { password, ...cleanUser } = mentorProfile.user;
+
+      const cleanMentorProfile = {
+        ...mentorProfile,
+        user: cleanUser
+      };
 
       return {
         success: true,
-        data: mentorProfile,
+        data: {
+          mentorProfile: cleanMentorProfile
+        }
       };
+
+
     }
 
-    const { password, ...profile } = existsUser;
 
-    return {
-      success: true,
-      data: profile,
-    };
   }
 
   async update(
