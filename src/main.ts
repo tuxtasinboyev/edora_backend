@@ -22,6 +22,43 @@ async function bootstrap() {
     prefix: '/uploads'
   });
 
+  // TO'G'RI CORS SOZLAMASI
+  app.enableCors({
+    origin: function (origin, callback) {
+      // Barcha domainlarga ruxsat berish
+      callback(null, true);
+      
+      // Agar ma'lum domainlarga cheklab qo'ymoqchi bo'lsangiz:
+      // const allowedOrigins = [
+      //   'http://localhost:5173',
+      //   'http://localhost:3000',
+      //   'http://18.199.221.227:1709',
+      //   'https://your-production-domain.com'
+      // ];
+      // if (!origin || allowedOrigins.includes(origin)) {
+      //   callback(null, true);
+      // } else {
+      //   callback(new Error('Not allowed by CORS'));
+      // }
+    },
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
+    allowedHeaders: 'Content-Type, Authorization, X-Requested-With, Accept, Origin, X-CSRF-Token',
+    preflightContinue: false,
+    optionsSuccessStatus: 204
+  });
+
+  // OPTIONS so'rovlarini qayta ishlash (qo'shimcha)
+  app.use((req, res, next) => {
+    if (req.method === 'OPTIONS') {
+      res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
+      res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin, X-CSRF-Token');
+      res.status(200).end();
+      return;
+    }
+    next();
+  });
+
   const config = new DocumentBuilder()
     .setTitle('API hujjatlari')
     .setDescription('Ushbu loyiha uchun auto-generated Swagger dokumentatsiya')
@@ -29,14 +66,6 @@ async function bootstrap() {
     .addBearerAuth()
     .build();
 
-  app.enableCors({
-    origin: '*',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    credentials: true,
-    allowedHeaders: '*',
-    preflightContinue: false,
-    optionsSuccessStatus: 204
-  });
   const document = SwaggerModule.createDocument(app, config);
 
   SwaggerModule.setup('api/edura', app, document);
@@ -45,5 +74,3 @@ async function bootstrap() {
   console.log('🚀 Server ishladi: http://localhost:1709/api/edura');
 }
 bootstrap();
-//salom
-
