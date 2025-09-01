@@ -13,7 +13,7 @@ async function bootstrap() {
       whitelist: true,
       transform: true,
       transformOptions: {
-        enableImplicitConversion: true, 
+        enableImplicitConversion: true,
       },
     }),
   );
@@ -29,10 +29,14 @@ async function bootstrap() {
     .addBearerAuth()
     .build();
 
-    app.enableCors({
-      origin: true,
-      credentials: true,
-    });
+  app.enableCors({
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
+    allowedHeaders: '*',
+    preflightContinue: false,
+    optionsSuccessStatus: 204
+  });
   const document = SwaggerModule.createDocument(app, config);
 
   SwaggerModule.setup('api/edura', app, document);

@@ -79,7 +79,7 @@ export class QuestionsService {
         if (!existMentorId) throw new NotFoundException('mentor not found!')
 
         const where: any = {
-            mentorId: mentorId
+           course: { mentorId }
         }
         if (read !== undefined) {
             where.read = read === true

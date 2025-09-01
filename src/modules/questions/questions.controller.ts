@@ -81,8 +81,8 @@ export class QuestionsController {
     @Param('courseId') courseId: string,
     @Query('offset') offset?: number,
     @Query('limit') limit?: number,
-    @Query('read', ParseBoolPipe) read?: boolean,
-    @Query('answered', ParseBoolPipe) answered?: boolean,
+    @Query('read') read?: boolean,
+    @Query('answered') answered?: boolean,
   ) {
     return this.questionsService.getQuestionsByCourseId(
       courseId,
@@ -105,8 +105,8 @@ export class QuestionsController {
     @Param('mentorId') mentorId: number,
     @Query('offset') offset?: number,
     @Query('limit') limit?: number,
-    @Query('read', ParseBoolPipe) read?: boolean,
-    @Query('answered', ParseBoolPipe) answered?: boolean,
+    @Query('read') read?: boolean,
+    @Query('answered') answered?: boolean,
   ) {
     return this.questionsService.getQuestionsByMentorId(
       mentorId,
