@@ -250,7 +250,7 @@ export class UsersService {
     const existsUser = await this.prisma.user.findUnique({ where: { id } });
     if (!existsUser) throw new NotFoundException('User not found');
 
-    await this.prisma.user.update({
+    const updatedUser = await this.prisma.user.update({
       where: { id },
       data: {
         fullName: payload.fullName,
@@ -280,10 +280,11 @@ export class UsersService {
         website: payload.website,
       },
     });
-
+    const { password, ...safeUser } = updatedUser;
     return {
       success: true,
       data: result,
+      safeUser,
     };
   }
 
