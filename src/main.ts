@@ -29,7 +29,13 @@ async function bootstrap() {
     .addBearerAuth()
     .build();
 
-  app.enableCors();
+  app.enableCors(
+    {
+      origin: '*',
+      methods: ['GET', 'POST', 'PUT', 'DELETE'],
+      allowedHeaders: ['Content-Type', 'Authorization']
+    }
+  );
   const document = SwaggerModule.createDocument(app, config);
 
   SwaggerModule.setup('api/edura', app, document);
