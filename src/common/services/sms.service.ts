@@ -22,7 +22,8 @@ export class SmsService {
         email: this.USERNAME,
         password: this.TOKEN,
       });
-
+      console.log(data);
+      
       await this.axiosInstance.post<SMSSendResponse>(
         '/message/sms/send',
         {

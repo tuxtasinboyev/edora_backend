@@ -15,7 +15,7 @@ import { UpdatePasswordDto } from './dto/resent-password';
 import { UpdateMentorProfileDto } from './dto/update-mentorProfie.dto';
 import { UpdatePhoneDto } from './dto/update-phone.dto';
 import { VerificationService } from '../../auth/verification/verification.service';
-import { EVeriification } from 'src/common/utils/helper/helper';
+import { EVeriification, generateOtp } from 'src/common/utils/helper/helper';
 import { join } from 'path';
 import { existsSync, unlinkSync } from 'fs';
 
@@ -25,32 +25,52 @@ export class ProfilesService {
     private prisma: PrismaService,
     private verificationService: VerificationService,
   ) { }
-  async phoneUpdate(payload: UpdatePhoneDto, userId: number) {
-    const chechUser = await this.prisma.user.findUnique({
-      where: { id: userId },
+  async phoneUpdate(payload: UpdatePhoneDto, id: number) {
+    const user = await this.prisma.user.findUnique({ where: { id } })
+    if (!user) {
+      throw new NotFoundException('User found');
+    }
+    const checkPhone = await this.prisma.user.findUnique({
+      where: { phone: payload.oldPhone },
     });
-    if (!chechUser) throw new ConflictException('user not found');
-    await this.verificationService.checkConfirim({
-      type: EVeriification.RESET_PASSWORD,
-      phone: payload.phone,
-      otp: payload.otp,
-    });
-    const chechPasword = await this.prisma.user.findUnique({
-      where: { phone: payload.phone },
-    });
-    if (chechPasword)
-      throw new ConflictException('this password already exist');
+    console.log(checkPhone);
 
-    await this.prisma.user.update({
-      where: { phone: payload.phone },
-      data: { password: payload.phone },
-    });
+    if (!checkPhone) return new NotFoundException('phone not exists!');
+    if (checkPhone!.phone === payload.newPhone) return new ConflictException('this this phone already exists!')
+    await this.verificationService.sendOtp({ type: EVeriification.EDIT_PHONE, phone: payload.newPhone });
+
     return {
       success: true,
       message: 'successfully updated!',
     };
   }
 
+  async confirmPhoneUpdate(otp: string, phone: string, userId: number) {
+
+
+      const existsUser = await this.prisma.user.findUnique({
+        where: { id: userId },
+      });
+
+
+      if (!existsUser) throw new NotFoundException('user not found');
+
+      const isValid = await this.verificationService.verifyOtp({
+        type: EVeriification.EDIT_PHONE,
+        phone: phone,
+        otp,
+      });
+      if (!isValid) throw new BadRequestException('Invalid OTP');
+
+      await this.prisma.user.update({
+        where: { id: userId },
+        data: { phone: phone },
+      });
+    return {
+      success: true,
+        message: 'Phone number updated successfully',
+      };
+  }
 
   async getMyProfile(userId: number) {
     if (!userId) {

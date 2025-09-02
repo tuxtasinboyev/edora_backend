@@ -28,6 +28,8 @@ import {
   ApiBearerAuth,
   ApiConsumes,
   ApiBody,
+  ApiOperation,
+  ApiResponse,
 } from '@nestjs/swagger';
 
 @ApiTags('Profiles')
@@ -37,9 +39,35 @@ import {
 export class ProfilesController {
   constructor(private readonly profilesService: ProfilesService) { }
 
+
   @Post('updatePhone')
-  async updatePhone(@Req() req, @Body() payload: UpdatePhoneDto) {
+  @ApiOperation({ summary: 'Telefon raqamni yangilash' })
+  @ApiBody({ type: UpdatePhoneDto })
+  @ApiResponse({ status: 200, description: 'OTP yuborildi, tasdiqlash kerak.' })
+  @ApiResponse({ status: 404, description: 'Foydalanuvchi topilmadi.' })
+  async updatePhone(@Body() payload: UpdatePhoneDto, @Req() req) {
     return this.profilesService.phoneUpdate(payload, req.user.id);
+  }
+
+  @Post('confirmPhoneUpdate')
+  @ApiOperation({ summary: 'Telefon raqamni yangilashni tasdiqlash' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        otp: { type: 'string', example: '123456' },
+        phone: { type: 'string', example: '+998901234567' },
+      },
+    },
+  })
+  @ApiResponse({ status: 200, description: 'Telefon raqami muvaffaqiyatli yangilandi.' })
+  @ApiResponse({ status: 400, description: 'OTP xato yoki muddati o‘tgan.' })
+  async confirmPhoneUpdate(
+    @Body('otp') otp: string,
+    @Body('phone') phone: string,
+    @Req() req
+  ) {
+    return this.profilesService.confirmPhoneUpdate(otp, phone, req.user.id);
   }
 
   @Get('me')

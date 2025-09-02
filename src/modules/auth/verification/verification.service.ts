@@ -105,6 +105,7 @@ export class VerificationService {
   }
 
   async sendOtp(payload: SendOtpDto) {
+
     const { type, phone } = payload;
     const key = this.getKey(type, phone);
     console.log(key, 'sendOtp key');
@@ -119,6 +120,8 @@ export class VerificationService {
         await this.throwIfUserExists(phone);
         break;
       case EVeriification.EDIT_PHONE:
+        await this.throwIfUserExists(phone);
+        break;
       case EVeriification.RESET_PASSWORD:
         await this.throwIfUserNotExists(phone);
         break;
@@ -126,6 +129,7 @@ export class VerificationService {
 
     const otp = generateOtp();
     await this.redisService.set(key, otp, 60 * 60);
+    console.log(type, otp, phone);
 
     await this.smsService.sendSMS(this.getMessage(type, otp)!, phone);
 
