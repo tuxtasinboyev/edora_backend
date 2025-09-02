@@ -167,7 +167,7 @@ export class ProfilesService {
 
     const isPassword = await compare(payload.password, existsUser.password);
     if (!isPassword)
-      throw new ConflictException('password or phone invalid!!!');
+      throw new NotFoundException('password or phone invalid!!!');
 
     const hashPassword = await hash(payload.newPassword, 10);
 
