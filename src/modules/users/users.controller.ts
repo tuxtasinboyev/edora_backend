@@ -10,6 +10,7 @@ import {
   UseGuards,
   UploadedFile,
   UseInterceptors,
+  Req,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto/create-user.dto';
@@ -35,6 +36,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import { Request } from 'express';
 
 @ApiTags('Users')
 @ApiBearerAuth()
@@ -166,13 +168,13 @@ export class UsersController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
-  @Put('mentor/:id')
+  @Roles('ADMIN', 'MENTOR')
+  @Put('mentor')
   @ApiOperation({ summary: 'Update mentor profile' })
-  @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: UpdateMentorDto })
-  updateMentorProfile(@Param('id') id: number, @Body() dto: UpdateMentorDto) {
-    return this.userService.updateMentorProfile(Number(id), dto);
+  updateMentorProfile(@Req() req, @Body() dto: UpdateMentorDto) {
+    const id = req.user.id;
+    return this.userService.updateMentorProfile(id, dto);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
