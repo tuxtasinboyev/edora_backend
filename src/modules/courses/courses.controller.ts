@@ -122,7 +122,6 @@ export class CoursesController {
         'published',
         'mentorId',
         'banner',
-        'introVideo',
       ],
     },
   })
