@@ -21,8 +21,8 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             echo "Creating project folder if it doesn't exist!"
-            mkdir -p /home/ubuntu/fixoo
-            cd /home/ubuntu/fixoo
+            mkdir -p /home/ubuntu/edora_backend
+            cd /home/ubuntu/edora_backend
 
             if [ ! -d "edora_backend/.git" ]; then
               echo "Cloning repository!" 
