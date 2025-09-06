@@ -16,28 +16,33 @@ jobs:
       - name: Deploy over SSH and run Docker Compose
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{  secrets.SERVER_HOST  }}
+          host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             echo "Creating project folder if it doesn't exist!"
-            mkdir -p /home/ubuntu/edora_backend
-            cd /home/ubuntu/edora_backend
+            mkdir -p /edora_backend
+            cd /edora_backend
 
             if [ ! -d "edora_backend/.git" ]; then
               echo "Cloning repository!" 
               git clone https://github.com/tuxtasinboyev/edora_backend.git
-            else
-              echo "Pulling latest changes!"
-              cd edora_backend    
-              git pull origin main  
             fi
-  
+
+            cd edora_backend    # Shu yerda docker-compose.yml mavjud
+
+            echo "Pulling latest changes!"
+            git reset --hard
+            git clean -fd
+            git pull origin main  
+
             echo "Stopping containers"
-            docker-compose down
+            docker-compose down || true
 
             echo "Building containers"
-            docker-compose build 
+            docker-compose build
 
             echo "Running containers"
             docker-compose up -d
+
+            echo "✅ Deploy finished successfully!"
