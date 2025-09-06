@@ -3,9 +3,46 @@ version: '3.9'
 services:
   app:
     build: .
+    container_name: nest_app
     env_file:
       - .env
     ports:
       - "1709:1709"
+    depends_on:
+      - postgres
+      - redis
     restart: always
     command: sh -c "npm run start:prod"
+    networks:
+      - app_network
+
+  postgres:
+    image: postgres:15
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: edura_db   # boshlang‘ich db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - app_network
+
+  redis:
+    image: redis:7
+    container_name: redis_cache
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - app_network
+
+volumes:
+  postgres_data:
+
+networks:
+  app_network:
+    driver: bridge

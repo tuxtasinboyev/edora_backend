@@ -1,5 +1,5 @@
 # =========================
-# 🔹 1-bosqich: Builder (devDependencies bilan)
+# 🔹 1-bosqich: Builder
 # =========================
 FROM node:22-alpine AS builder
 
@@ -7,8 +7,7 @@ WORKDIR /app
 
 COPY package*.json ./
 
-# 🧠 Nest CLI dev dependency bo'lishi mumkin, shuning uchun production emas
-RUN npm install
+RUN npm ci
 
 COPY prisma ./prisma
 COPY . .
@@ -17,16 +16,15 @@ RUN npx prisma generate
 RUN npm run build
 
 # =========================
-# 🔸 2-bosqich: Run-time (faqat keraklilar)
+# 🔸 2-bosqich: Runtime
 # =========================
 FROM node:22-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm install --production
+COPY package*.json package-lock.json ./
+RUN npm ci --omit=dev
 
-# ⚡ Build qilingan kodlarni builder'dan olish
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
