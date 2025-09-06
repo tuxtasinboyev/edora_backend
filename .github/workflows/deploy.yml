@@ -39,3 +39,5 @@ jobs:
             docker compose up -d --build
 
             echo "✅ Deploy yakunlandi!"
+
+            
