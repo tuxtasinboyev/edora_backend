@@ -46,6 +46,3 @@ jobs:
             docker-compose up -d
 
             echo "✅ Deploy finished successfully!"
-
-
-            
