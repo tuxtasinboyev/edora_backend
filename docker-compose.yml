@@ -28,7 +28,7 @@ services:
     env_file:
       - .env
     ports:
-      - "3000:3000"
+      - "1709:1709"
     depends_on:
       - db
       - redis  
